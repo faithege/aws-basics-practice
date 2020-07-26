@@ -11,7 +11,8 @@ Learning the basics of CloudFormation, Lambda, API Gateway and Bash
 ### Bash
 - Basic script created which deploys a stack and invokes the stack function. This is useful when a change has been made to the stack template,
 and then subsequently checking that the Lambda function is working as expected.
--This script can be invoked using ```./deploy-and-invoke.sh <stack-name> <template-file-name> '<payload>'```
+-This script can be invoked using
+```./deploy-and-invoke.sh <stack-name> <template-file-name> '<payload>'```
 
 ## Running the App
 Coming Soon
