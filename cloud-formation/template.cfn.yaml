@@ -29,10 +29,8 @@ Resources:
         - !Ref Role # Here we are creating the policy as a stand alone resource in the stack, cleaner than writing in line
   Function:
     Type: AWS::Lambda::Function
-    Properties: 
-      Code: # This had been in-line, I've now moved into a separate file store in an s3 bucket
-        S3Bucket: cbf-faith-bucket
-        S3Key: 860520ffda733c57a0257448c0fdfe92
+    Properties: # This had been in-line, I've now moved into a separate file store in an s3 bucket
+      Code: ../lambda #directory with lambda in
         # Comments don't work inside a |, in YAML | signifies that the code should be read as is
         # A Zip file is one way of importing a library, could also put in an S3 bucket and refer to it
       Runtime: nodejs12.x
