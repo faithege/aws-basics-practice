@@ -2,6 +2,7 @@
 # We've done the minimally required fields for now (see AWS documentation)
 # Any comments about your template can be specified in the description.
 Description: "First test sample template"
+Transform: AWS::Serverless-2016-10-31
 # In Resources you declare the AWS resource that you want to create and specify in the stack, such as an Amazon S3 bucket or AWS Lambda.  
 Resources: 
   Role:
@@ -15,6 +16,7 @@ Resources:
               # Here we've specified the Lambda service, we could be more specific and choose a particular lambda
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
+
   DynamoPolicy:
     Type: AWS::IAM::Policy
     Properties:
@@ -27,10 +29,11 @@ Resources:
             Resource: !GetAtt Table.Arn # or !Sub arn:aws:dynamodb:eu-west-1:${AWS::AccountId}:table/${Table} - sub acts as a template literal, substitute names in
       Roles: 
         - !Ref Role # Here we are creating the policy as a stand alone resource in the stack, cleaner than writing in line
+
   Function:
-    Type: AWS::Lambda::Function
+    Type: AWS::Serverless::Function
     Properties: # This had been in-line, I've now moved into a separate file store in an s3 bucket
-      Code: ../lambda #directory with lambda in
+      CodeUri: ../lambda #directory with lambda in
         # Comments don't work inside a |, in YAML | signifies that the code should be read as is
         # A Zip file is one way of importing a library, could also put in an S3 bucket and refer to it
       Runtime: nodejs12.x
@@ -41,6 +44,7 @@ Resources:
       Environment: 
         Variables:
           TABLE_NAME: !Ref Table # Referencing the table below
+
   Table: # Table resource
     Type: AWS::DynamoDB::Table
     Properties:
