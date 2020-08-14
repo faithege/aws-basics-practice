@@ -1,11 +1,15 @@
 #!/bin/bash
 set -e # Good practice - ensures that if any errors received, script does not continue to run
 export AWS_DEFAULT_PROFILE=cbf # Making sure I'm always using the right aws profile
+export AWS_PROFILE=cbf # Another name that my aws cli seems to use
 
 # Declaring parameters that will be passed in when running the script
 STACK=$1 
 TEMPLATE=$2
 PAYLOAD=$3 #the JSON object needs to be passed in with ''
+
+WORKDIR="../working"
+mkdir -p ${WORKDIR}
 
 # [] are called test if want look up commands/flags type man test
 # essentially creating a custom error message if one of the three parameters are missing
@@ -21,7 +25,7 @@ then
     exit 1
 fi
 
-WORKING_TEMPLATE="../working/output-template.cfn.yaml" # quotation marks not necessarily needed, but safer
+WORKING_TEMPLATE="${WORKDIR}/output-template.cfn.yaml" # quotation marks not necessarily needed, but safer
 BUCKET=cbf-faith-bucket #in bash don't use space around equals
 
 aws cloudformation package --template-file ${TEMPLATE} --s3-bucket ${BUCKET} --output-template-file ${WORKING_TEMPLATE}
