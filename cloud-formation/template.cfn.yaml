@@ -2,7 +2,7 @@
 # We've done the minimally required fields for now (see AWS documentation)
 # Any comments about your template can be specified in the description.
 Description: "First test sample template"
-Transform: AWS::Serverless-2016-10-31
+# Transform: AWS::Serverless-2016-10-31
 # In Resources you declare the AWS resource that you want to create and specify in the stack, such as an Amazon S3 bucket or AWS Lambda.  
 Resources: 
   Role:
@@ -16,6 +16,8 @@ Resources:
               # Here we've specified the Lambda service, we could be more specific and choose a particular lambda
               Service: lambda.amazonaws.com
             Action: sts:AssumeRole
+      ManagedPolicyArns: # allows our lambda to write to logs - this policy is created by AWS
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
 
   DynamoPolicy:
     Type: AWS::IAM::Policy
@@ -31,9 +33,9 @@ Resources:
         - !Ref Role # Here we are creating the policy as a stand alone resource in the stack, cleaner than writing in line
 
   Function:
-    Type: AWS::Serverless::Function
+    Type: AWS::Lambda::Function
     Properties: # This had been in-line, I've now moved into a separate file store in an s3 bucket
-      CodeUri: ../lambda #directory with lambda in
+      Code: ../lambda #directory with lambda in
         # Comments don't work inside a |, in YAML | signifies that the code should be read as is
         # A Zip file is one way of importing a library, could also put in an S3 bucket and refer to it
       Runtime: nodejs12.x
@@ -57,3 +59,37 @@ Resources:
       KeySchema:
       - AttributeName: Id # We are hashing the data to give it a more even distribution
         KeyType: HASH
+
+  # Permission for API gateway to execute our function - giving any API permission at the moment (make more specific with source Arn)
+  ApiGatewayPermission: 
+    Type: AWS::Lambda::Permission 
+    Properties: 
+      FunctionName: !GetAtt Function.Arn 
+      Action: lambda:InvokeFunction 
+      Principal: apigateway.amazonaws.com
+
+  Api: #Gateway resource
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: RestApi
+  
+  ApiResource: 
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref Api
+      ParentId: !GetAtt 
+        - Api
+        - RootResourceId # specified in docs
+      PathPart: '{proxy+}' # this catches all file paths (except the root) - could be more specific eg /devices goes to a specific lambda
+  
+  ApiMethod:
+    Type: AWS::ApiGateway::Method
+    Properties: 
+      RestApiId: !Ref Api
+      ResourceId: !Ref ApiResource
+      HttpMethod: ANY
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri: !Sub arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${Function.Arn}/invocations

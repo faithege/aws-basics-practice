@@ -20,14 +20,18 @@ const documentClient = new AWS.DynamoDB.DocumentClient({'region': region})
 exports.handler = async function(event, context) {
   //console.log(process.env.AWS_ACCESS_KEY_ID, process.env.AWS_SECRET_ACCESS_KEY, process.env.AWS_SESSION_TOKEN)
   console.log("Received event", JSON.stringify(event))
+
+  const body = JSON.parse(event.body) // converts a JSON string to a JSON object
+  console.log("body:", JSON.stringify(body)) // when logging log the string version otherwise will just say Object
+
   const request = {
     TableName: tablename,
     Key:{
-      'Id': event.id
+      'Id': body.id
     },
     UpdateExpression: "ADD SeenCount :step",
     ExpressionAttributeValues:{
-      ':step': event.step || 1,
+      ':step': body.step || 1,
     },
     ReturnValues:"UPDATED_NEW"
   }
@@ -36,4 +40,6 @@ exports.handler = async function(event, context) {
   
   //console.log("Context", JSON.stringify(context));
   console.log(JSON.stringify(result));
+
+  return {"statusCode": 200, "body": JSON.stringify(result)}
 }
