@@ -36,10 +36,13 @@ exports.handler = async function(event, context) {
     ReturnValues:"UPDATED_NEW"
   }
   console.log("Calling DDB", JSON.stringify(request))
-  const result = await documentClient.update(request).promise()
-  
-  //console.log("Context", JSON.stringify(context));
-  console.log(JSON.stringify(result));
 
-  return {"statusCode": 200, "body": JSON.stringify(result)}
+  try {
+    const result = await documentClient.update(request).promise()
+    return {"statusCode": 200, "body": JSON.stringify(result)}
+  }
+  catch(error){
+    return {"statusCode": error.statusCode, "body": error.message}
+  }
+
 }
