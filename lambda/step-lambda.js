@@ -17,29 +17,46 @@ const documentClient = new AWS.DynamoDB.DocumentClient({'region': region})
 // result is the returned proomised object (awaits until async function completed) - i promise rejected an exception is thrown
 // NB 'context' parameter has info in it tthat we could find useful and extract, although in this example we don't need it
 
-exports.handler = async function(event, context) {
+exports.handler = function(event, context) {
   //console.log(process.env.AWS_ACCESS_KEY_ID, process.env.AWS_SECRET_ACCESS_KEY, process.env.AWS_SESSION_TOKEN)
   console.log("Received event", JSON.stringify(event))
 
-  const body = JSON.parse(event.body) // converts a JSON string to a JSON object
-  console.log("body:", JSON.stringify(body)) // when logging log the string version otherwise will just say Object
+  const method = event.httpMethod
+  console.log("method:", method)
 
-  const request = {
-    TableName: tablename,
-    Key:{
-      'Id': body.id
-    },
-    UpdateExpression: "ADD SeenCount :step",
-    ExpressionAttributeValues:{
-      ':step': body.step || 1,
-    },
-    ReturnValues:"UPDATED_NEW"
+  switch(method) {
+    case "POST":
+      handlePostRequest(event)
+      break; // not needed once have try/catch merged
+    case "GET":
+      return {"statusCode": 500, "body": "GET logic to be implemented"}
+    default:
+      return {"statusCode": 500, "body": "Please update lambda to handle this method"}
   }
-  console.log("Calling DDB", JSON.stringify(request))
-  const result = await documentClient.update(request).promise()
-  
-  //console.log("Context", JSON.stringify(context));
-  console.log(JSON.stringify(result));
 
-  return {"statusCode": 200, "body": JSON.stringify(result)}
+  async function handlePostRequest(event) {
+    const body = JSON.parse(event.body) // converts a JSON string to a JSON object
+    console.log("body:", JSON.stringify(body)) // when logging log the string version otherwise will just say Object
+ 
+    const request = {
+      TableName: tablename,
+      Key:{
+        'Id': body.id
+      },
+      UpdateExpression: "ADD SeenCount :step",
+      ExpressionAttributeValues:{
+        ':step': body.step || 1,
+      },
+      ReturnValues:"UPDATED_NEW"
+    }
+    console.log("Calling DDB", JSON.stringify(request))
+
+    const result = await documentClient.update(request).promise()
+    console.log(JSON.stringify(result));
+    return {"statusCode": 200, "body": JSON.stringify(result)}
+  }
+  
+  
+
+  
 }
