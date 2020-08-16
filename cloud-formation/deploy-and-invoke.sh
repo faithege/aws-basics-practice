@@ -35,3 +35,5 @@ aws cloudformation deploy --template-file ${WORKING_TEMPLATE} --stack-name ${STA
 # Destcribe-stack-resource returns a JSON which we interrogrape with jq to get the id we need
 FUNCTION=$(aws cloudformation describe-stack-resource --stack-name ${STACK} --logical-resource-id Function | jq -r .StackResourceDetail.PhysicalResourceId)
 aws lambda invoke --cli-binary-format raw-in-base64-out --log-type Tail --payload ${PAYLOAD} --function-name ${FUNCTION} output | jq -r .LogResult | base64 --decode
+
+# example of how to call> bash -x deploy-and-invoke.sh cbf template.cfn.yaml '{"id":"thomas"}'
