@@ -21,31 +21,49 @@ exports.handler = async function(event, context) {
   //console.log(process.env.AWS_ACCESS_KEY_ID, process.env.AWS_SECRET_ACCESS_KEY, process.env.AWS_SESSION_TOKEN)
   console.log("Received event", JSON.stringify(event))
 
-  const body = JSON.parse(event.body) // converts a JSON string to a JSON object
-  console.log("body:", JSON.stringify(body)) // when logging log the string version otherwise will just say Object
+  const method = event.httpMethod
+  console.log("method:", method)
 
-  const request = {
-    TableName: tablename,
-    Key:{
-      'Id': body.id
-    },
-    UpdateExpression: "ADD SeenCount :step",
-    ExpressionAttributeValues:{
-      ':step': body.step || 1,
-    },
-    ReturnValues:"UPDATED_NEW"
+  switch(method) {
+    case "POST":
+      return await handlePostRequest(event)
+    case "GET":
+      return {"statusCode": 500, "body": "GET logic to be implemented"}
+    default:
+      return {"statusCode": 500, "body": "Please update lambda to handle this method"}
   }
-  console.log("Calling DDB", JSON.stringify(request))
 
-  try {
-    const result = await documentClient.update(request).promise()
-    console.log("result:", result)
-    return {"statusCode": 200, "body": JSON.stringify(result)}
+  async function handlePostRequest(event) {
+    const body = JSON.parse(event.body) // converts a JSON string to a JSON object
+    console.log("body:", JSON.stringify(body)) // when logging log the string version otherwise will just say Object
+ 
+    const request = {
+      TableName: tablename,
+      Key:{
+        'Id': body.id
+      },
+      UpdateExpression: "ADD SeenCount :step",
+      ExpressionAttributeValues:{
+        ':step': body.step || 1,
+      },
+      ReturnValues:"UPDATED_NEW"
+    }
+    console.log("Calling DDB", JSON.stringify(request))
+
+    try {
+      const result = await documentClient.update(request).promise()
+      console.log("result:", result)
+      return {"statusCode": 200, "body": JSON.stringify(result)}
+    }
+    catch(error){
+      console.log("error:", error)
+      return {"statusCode": 503, "body": error}
+      // error may not always have a statusCode or message so best not to extract them, instead give a generic code and print whole error
+    }
   }
-  catch(error){
-    console.log("error:", error)
-    return {"statusCode": 503, "body": error}
-    // error may not always have a statusCode or message so best not to extract them, instead give a generic code and print whole error
-  }
+  
+  
+
+  
 
 }
