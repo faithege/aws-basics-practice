@@ -50,12 +50,20 @@ exports.handler = async function(event, context) {
     }
     console.log("Calling DDB", JSON.stringify(request))
 
-    const result = await documentClient.update(request).promise()
-    console.log(JSON.stringify(result));
-    return {"statusCode": 200, "body": JSON.stringify(result)}
+    try {
+      const result = await documentClient.update(request).promise()
+      console.log("result:", result)
+      return {"statusCode": 200, "body": JSON.stringify(result)}
+    }
+    catch(error){
+      console.log("error:", error)
+      return {"statusCode": 503, "body": error}
+      // error may not always have a statusCode or message so best not to extract them, instead give a generic code and print whole error
+    }
   }
   
   
 
   
+
 }
