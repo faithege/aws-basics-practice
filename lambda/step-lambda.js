@@ -28,7 +28,7 @@ exports.handler = async function(event, context) {
     case "POST":
       return await handlePostRequest(event)
     case "GET":
-      return {"statusCode": 500, "body": "GET logic to be implemented"}
+      return await handleGetRequest()
     default:
       return {"statusCode": 500, "body": "Please update lambda to handle this method"}
   }
@@ -61,8 +61,39 @@ exports.handler = async function(event, context) {
       // error may not always have a statusCode or message so best not to extract them, instead give a generic code and print whole error
     }
   }
+
+  async function handleGetRequest(event) {
+ 
+    const request = {
+      TableName: tablename
+    }
+    console.log("Scanning DDB", JSON.stringify(request))
+
+    documentClient.scan(request, onScan);
+
+    function onScan(error, data) {
+      if (error) {
+          console.error("Unable to scan the table. Error JSON:", JSON.stringify(error, null, 2));
+      } else {
+        let results = []
+          // print all the entrues
+          console.log("Scan succeeded.");
+          results.extend(data.Items)
+          data.Items.forEach(function(item) {
+              console.log(item.id + ": ",item.step);
+          });
   
-  
+          // continue scanning if we have more names, because scan can retrieve a maximum of 1MB of data
+          if (typeof data.LastEvaluatedKey != "undefined") {
+              console.log("Scanning for more...");
+              request.ExclusiveStartKey = data.LastEvaluatedKey;
+              docClient.scan(params, onScan);
+          }
+
+          // how do I know when it's finished to return the succes message?
+      }
+    }
+    }
 
   
 

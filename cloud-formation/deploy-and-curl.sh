@@ -21,14 +21,16 @@ WORKING_TEMPLATE="${WORKDIR}/output-template.cfn.yaml"
 BUCKET=cbf-faith-bucket
 #For now this is a constant as we are using a proxy resource that takes ANY http method
 URL="https://wkxkie4zsc.execute-api.eu-west-1.amazonaws.com/Alpha/test"
-METHOD="POST"
+METHOD="GET"
 
 # Repackage lambda and store in s3
 aws cloudformation package --template-file ${TEMPLATE} --s3-bucket ${BUCKET} --output-template-file ${WORKING_TEMPLATE}
 # Redeploy stack
 aws cloudformation deploy --template-file ${WORKING_TEMPLATE} --stack-name ${STACK} --capabilities CAPABILITY_IAM
-# Invoke lambda via api gateway
-curl -X ${METHOD} -d ${PAYLOAD} -i ${URL}
+# Invoke lambda via api gateway (POST)
+# curl -X ${METHOD} -d ${PAYLOAD} -i ${URL}
+# Invoke lambda via api gateway (GET)
+curl -X ${METHOD} -i ${URL}
 # Outputs new line in terminal so prompt not on same line as previous result
 echo -ne '\n'
 
