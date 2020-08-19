@@ -17,7 +17,7 @@ const documentClient = new AWS.DynamoDB.DocumentClient({'region': region})
 // result is the returned proomised object (awaits until async function completed) - i promise rejected an exception is thrown
 // NB 'context' parameter has info in it tthat we could find useful and extract, although in this example we don't need it
 
-exports.handler = function(event, context) {
+exports.handler = async function(event, context) {
   //console.log(process.env.AWS_ACCESS_KEY_ID, process.env.AWS_SECRET_ACCESS_KEY, process.env.AWS_SESSION_TOKEN)
   console.log("Received event", JSON.stringify(event))
 
@@ -26,8 +26,7 @@ exports.handler = function(event, context) {
 
   switch(method) {
     case "POST":
-      handlePostRequest(event)
-      break; // not needed once have try/catch merged
+      return await handlePostRequest(event)
     case "GET":
       return {"statusCode": 500, "body": "GET logic to be implemented"}
     default:
