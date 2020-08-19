@@ -28,7 +28,7 @@ aws cloudformation package --template-file ${TEMPLATE} --s3-bucket ${BUCKET} --o
 # Redeploy stack
 aws cloudformation deploy --template-file ${WORKING_TEMPLATE} --stack-name ${STACK} --capabilities CAPABILITY_IAM
 # Invoke lambda via api gateway
-curl -v -X ${METHOD} -d ${PAYLOAD} -i ${URL}
+curl -X ${METHOD} -d ${PAYLOAD} -i ${URL}
 # Outputs new line in terminal so prompt not on same line as previous result
 echo -ne '\n'
 

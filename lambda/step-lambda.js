@@ -39,10 +39,13 @@ exports.handler = async function(event, context) {
 
   try {
     const result = await documentClient.update(request).promise()
+    console.log("result:", result)
     return {"statusCode": 200, "body": JSON.stringify(result)}
   }
   catch(error){
-    return {"statusCode": error.statusCode, "body": error.message}
+    console.log("error:", error)
+    return {"statusCode": 503, "body": error}
+    // error may not always have a statusCode or message so best not to extract them, instead give a generic code and print whole error
   }
 
 }
