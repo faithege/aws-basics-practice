@@ -27,7 +27,9 @@ Resources:
         Version: 2012-10-17 #optional
         Statement: # - is how we denote an array
           - Effect: Allow
-            Action: dynamodb:UpdateItem # * would allow to do anything, not good practice, though UpdateItem probably too restrictive would probs want to atttach predefined AWS DDB Read/Write access policy
+            Action: 
+              - dynamodb:UpdateItem # * would allow to do anything, not good practice, though UpdateItem probably too restrictive would probs want to atttach predefined AWS DDB Read/Write access policy
+              - dynamodb:Scan
             Resource: !GetAtt Table.Arn # or !Sub arn:aws:dynamodb:eu-west-1:${AWS::AccountId}:table/${Table} - sub acts as a template literal, substitute names in
       Roles: 
         - !Ref Role # Here we are creating the policy as a stand alone resource in the stack, cleaner than writing in line
