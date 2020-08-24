@@ -27,3 +27,35 @@ console.log(factorial(2))
 console.log(factorial(3))
 
 console.log(factorialRecursive(4))
+
+// recursive practice
+function countdown(number){
+
+    console.log(number)
+
+    if (number === 0) {
+        return number
+    }
+    else {
+        return countdown(--number)
+    }
+
+}
+countdown(10)
+
+// x%10 gets the last digit
+// Math.floor(number/10) pops off the last digit
+
+function sumOfDigits(number){
+    if (number == 0) {
+        return 0
+    } else {
+        return (number % 10) + sumOfDigits(Math.floor(number/10))
+        
+    }
+
+}
+
+console.log(sumOfDigits(234))
+console.log(sumOfDigits(17))
+console.log(sumOfDigits(21211))
