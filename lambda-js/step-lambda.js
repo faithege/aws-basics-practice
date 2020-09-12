@@ -44,6 +44,7 @@ exports.handler = async function(event, context) {
 
 }
 
+// const handlePostRequest = async function(event) { << example of Functional Programming
 async function handlePostRequest(event) {
   const body = JSON.parse(event.body) // converts a JSON string to a JSON object
   console.log("body:", JSON.stringify(body)) // when logging log the string version otherwise will just say Object
