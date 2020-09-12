@@ -1,3 +1,6 @@
+// process.env is specific to node/js
+//aws dependency defined in package lock
+
 process.env.AWS_PROFILE = 'cbf' // PROFILE for aws-sdk (used by handler), need AWS_DEFAULT_PROFILE if doing the same thing in the cli
 process.env.TABLE_NAME = 'cbf-Table-9D7EAURJPY2R'
 process.env.AWS_REGION = 'eu-west-1'
