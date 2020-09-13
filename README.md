@@ -18,7 +18,7 @@ and then subsequently checking that the Lambda function is working as expected.
 -This script can be invoked using
 ```./deploy-and-curl.sh <stack-name> <template-file-name> <method> '<payload>'```
 - `run-in-docker` - Basic script created which runs the step-lambda within a Docker Container (so you don't have to re-deploy the CloudFormation stack each time you make a modification to the lambda)
-```./run-in-docker.sh```
+```./run-in-docker.sh  <method> ```
 
 ## Running the App
 Coming Soon

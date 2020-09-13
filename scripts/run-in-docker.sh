@@ -10,6 +10,8 @@ export AWS_PROFILE='cbf'
 export AWS_REGION='eu-west-1'
 TABLE_NAME='cbf-Table-9D7EAURJPY2R'
 
+METHOD=$1 
+
 # We need these credentials as in the Docker env, it cannot access my credentials file
 # $() means execute this command - so we set the return value from the command
 export AWS_ACCESS_KEY_ID=$(aws configure get aws_access_key_id --profile ${AWS_PROFILE})
@@ -35,7 +37,7 @@ export AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key --profile
 
 # hardcoded payload
 # PAYLOAD='{"httpMethod":"POST","body":"{\"id\":\"Sally\"}"}'
-SCRIPT='const testPostBody = {id: "Sally"}; const testEvent = { httpMethod: "POST", body: JSON.stringify(testPostBody)}; console.log(JSON.stringify(testEvent));'
+SCRIPT="const testPostBody = {id: 'Sally'}; const testEvent = { httpMethod: '${METHOD}', body: JSON.stringify(testPostBody)}; console.log(JSON.stringify(testEvent));"
 PAYLOAD=$(node -e "${SCRIPT}") #-e allows above script to be evaluated by node, quotes preserve new lines in script
 
 # \ allows multi-line commands, requires space before but none after
