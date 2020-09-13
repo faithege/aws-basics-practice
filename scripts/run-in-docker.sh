@@ -22,22 +22,22 @@ export AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key --profile
 # We are piping to stdin of read command, which lets us set a variable
 # look up read docs - read for linux, cat for mac
 #read -r -d '' SCRIPT <<'EOF'
-# cat <<'EOF'
-# const testPostBody = {
-#     id: "Sally"
-# }
+SCRIPT=$(cat <<'EOF'
+const testPostBody = {
+    id: "Sally"
+}
 
-# // This is ignored if we use a GET request
-# const testEvent = { 
-#     httpMethod: POST,
-#     body: JSON.stringify(testPostBody)
-# }
-# console.log(JSON.stringify(testEvent))
-# EOF
-
+// This is ignored if we use a GET request
+const testEvent = { 
+    httpMethod: "GET",
+    body: JSON.stringify(testPostBody)
+}
+console.log(JSON.stringify(testEvent))
+EOF
+)
 # hardcoded payload
 # PAYLOAD='{"httpMethod":"POST","body":"{\"id\":\"Sally\"}"}'
-SCRIPT="const testPostBody = {id: 'Sally'}; const testEvent = { httpMethod: '${METHOD}', body: JSON.stringify(testPostBody)}; console.log(JSON.stringify(testEvent));"
+# SCRIPT="const testPostBody = {id: 'Sally'}; const testEvent = { httpMethod: '${METHOD}', body: JSON.stringify(testPostBody)}; console.log(JSON.stringify(testEvent));"
 PAYLOAD=$(node -e "${SCRIPT}") #-e allows above script to be evaluated by node, quotes preserve new lines in script
 
 # \ allows multi-line commands, requires space before but none after
