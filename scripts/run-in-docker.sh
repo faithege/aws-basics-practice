@@ -22,7 +22,7 @@ export AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key --profile
 # We are piping to stdin of read command, which lets us set a variable
 # look up read docs - read for linux, cat for mac
 #read -r -d '' SCRIPT <<'EOF'
-SCRIPT=$(cat <<'EOF'
+SCRIPT=$(cat <<EOF
 const testPostBody = {
     id: "Sally"
 }
