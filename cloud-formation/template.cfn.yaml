@@ -37,7 +37,7 @@ Resources:
   Function:
     Type: AWS::Lambda::Function
     Properties: # This had been in-line, I've now moved into a separate file store in an s3 bucket
-      Code: ../lambda-js #directory with lambda in
+      Code: ../lambda-js/lib #directory with lambda in
         # Comments don't work inside a |, in YAML | signifies that the code should be read as is
         # A Zip file is one way of importing a library, could also put in an S3 bucket and refer to it
       Runtime: nodejs12.x

@@ -3,6 +3,9 @@ set -e # Good practice - ensures that if any errors received, script does not co
 export AWS_DEFAULT_PROFILE=cbf # Making sure I'm always using the right aws profile
 export AWS_PROFILE=cbf # Another name that my aws cli seems to use
 
+# Reliably get the directory containing this script
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 # Declaring parameters that will be passed in when running the script
 STACK=$1 
 TEMPLATE=$2
@@ -27,6 +30,17 @@ fi
 
 WORKING_TEMPLATE="${WORKDIR}/output-template.cfn.yaml" # quotation marks not necessarily needed, but safer
 BUCKET=cbf-faith-bucket #in bash don't use space around equals
+
+# Build the app
+(
+  cd ${DIR}/../lambda-js
+  # Use nvm to switch to the project's node version
+  [ -s "${NVM_DIR}/nvm.sh" ] && source "${NVM_DIR}/nvm.sh"
+  [ -s "$(brew --prefix nvm)/nvm.sh" ] && source "$(brew --prefix nvm)/nvm.sh"
+  nvm use
+  # compile
+  npm run transpile
+)
 
 aws cloudformation package --template-file ${TEMPLATE} --s3-bucket ${BUCKET} --output-template-file ${WORKING_TEMPLATE}
 # No need to use && as in a script we have set -e 
