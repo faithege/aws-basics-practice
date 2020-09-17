@@ -29,7 +29,7 @@ const testPostBody = {
 
 // This is ignored if we use a GET request
 const testEvent = { 
-    httpMethod: "GET",
+    httpMethod: "${METHOD}",
     body: JSON.stringify(testPostBody)
 }
 console.log(JSON.stringify(testEvent))
