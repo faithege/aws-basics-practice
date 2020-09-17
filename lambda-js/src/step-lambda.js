@@ -1,9 +1,9 @@
-const AWS = require('aws-sdk')  // this sdk supports promises
+import AWS from 'aws-sdk'  // this sdk supports promises
+import {handlePostRequest, handleGetRequest} from "./handlers"
+
 const tablename = process.env.TABLE_NAME
 const region = process.env.AWS_REGION
 const documentClient = new AWS.DynamoDB.DocumentClient({'region': region})
-const handlePostRequest = require("./handlers").handlePostRequest
-const handleGetRequest = require("./handlers").handleGetRequest
 
 // Importing aws-sdk using JS, believe document client needed for JS lambda writing
 // Could hardcode the table name, but bettter practice to put in environment variables (this is automatically done for AWS_REGION, and ACCESS_KEY)

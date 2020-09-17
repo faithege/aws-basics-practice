@@ -3,6 +3,9 @@ set -e
 export AWS_DEFAULT_PROFILE=cbf 
 export AWS_PROFILE=cbf 
 
+# Reliably get the directory containing this script
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
+
 # Declaring parameters that will be passed in when running the script
 STACK=$1 
 TEMPLATE=$2
@@ -23,6 +26,16 @@ BUCKET=cbf-faith-bucket
 #For now this is a constant as we are using a proxy resource that takes ANY http method
 URL="https://wkxkie4zsc.execute-api.eu-west-1.amazonaws.com/Alpha/test"
 
+# Build the app
+(
+  cd ${DIR}/../lambda-js
+  # Use nvm to switch to the project's node version
+  [ -s "${NVM_DIR}/nvm.sh" ] && source "${NVM_DIR}/nvm.sh"
+  [ -s "$(brew --prefix nvm)/nvm.sh" ] && source "$(brew --prefix nvm)/nvm.sh"
+  nvm use
+  # compile
+  npm run transpile
+)
 
 # Repackage lambda and store in s3
 aws cloudformation package --template-file ${TEMPLATE} --s3-bucket ${BUCKET} --output-template-file ${WORKING_TEMPLATE}
