@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e 
 
-# Reliably get the directory containing this script
+# Reliably get the directory containing this script, rather than hardcode
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 
 # Set env vars as we are running the lambda outside of the lambda environment
@@ -22,8 +22,7 @@ export AWS_SECRET_ACCESS_KEY=$(aws configure get aws_secret_access_key --profile
 
 # This is an example of a heredoc
 # We are piping to stdin of read command, which lets us set a variable
-# look up read docs - read for linux, cat for mac
-#read -r -d '' SCRIPT <<'EOF'
+# If EOF has quotations it won't interpolate variablesl ike METHOD
 SCRIPT=$(cat <<EOF
 const testPostBody = {
     id: "Sally"
@@ -56,6 +55,8 @@ PAYLOAD=$(node -e "${SCRIPT}") #-e allows above script to be evaluated by node, 
 # -e is for environment variables, can either state specifically (as long as exported) or can use = to define
 # -v is the path to the directory in which the lambda is in. NB - this image specifies that must use absolute path
 # also specify runtime node version, and the optional elements of the specific lambda handler to trigger, and the event too trigger it with
+
+#as now transpiling -> make sure run the lib version!
 docker run --rm \
   -e TABLE_NAME=${TABLE_NAME} \
   -e AWS_REGION \

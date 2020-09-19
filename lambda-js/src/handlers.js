@@ -1,4 +1,6 @@
 // const handlePostRequest = async function(event) { << example of Functional Programming
+
+//in newer JS can export functions/constants in the same file separately - we are able tto do this as we then transpile
 export async function handlePostRequest(documentClient, tablename, event) {
   const body = JSON.parse(event.body) // converts a JSON string to a JSON object
   console.log("body:", JSON.stringify(body)) // when logging log the string version otherwise will just say Object
