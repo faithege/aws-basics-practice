@@ -1,0 +1,26 @@
+version: '2.1'
+
+services:
+  localstack:
+    image: localstack/localstack
+    ports:
+      - "4566:4566"
+      - "4571:4571"
+    expose: 
+      - 4566
+    environment:
+      SERVICES: dynamodb
+      DATA_DIR: /tmp/localstack/data
+      DEFAULT_REGION: eu-west-1
+    # needed to add /private - apple quirk
+    # temporary directory where data saved
+    volumes:
+      - "/private${TMPDIR:-/tmp/localstack}:/tmp/localstack"
+  lambda:
+    image: lambci/lambda:nodejs12.x
+    volumes: 
+      - ${DIR}/../lambda-js/lib:/var/task:ro,delegated
+    depends_on: 
+      - localstack
+
+      
