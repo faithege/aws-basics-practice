@@ -6,7 +6,7 @@ services:
     ports:
       - "4566:4566"
       - "4571:4571"
-    expose: 
+    expose: # we expose port 4566, this is how the lambda coontainer can access the dynamodb
       - 4566
     environment:
       SERVICES: dynamodb
