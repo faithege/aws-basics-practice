@@ -19,6 +19,8 @@ and then subsequently checking that the Lambda function is working as expected.
 ```./deploy-and-curl.sh <stack-name> <template-file-name> <method> '<payload>'```
 - `run-in-docker` - Basic script created which runs the step-lambda within a Docker Container (so you don't have to re-deploy the CloudFormation stack each time you make a modification to the lambda)
 ```./run-in-docker.sh  <method> ```
+- `run-in-docker-compose` - Basic script created which runs triggers the step-lambda contained within a localstack container, alongside a test-table (to avoid polluting the real AWS table)
+```./run-in-docker-compose.sh  <method> ```
 
 ## Running the App
 Coming Soon
