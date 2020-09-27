@@ -55,19 +55,25 @@ describe('testing dynamoScan', () => {
 
     // ARRANGE - insert data
     const ids = ['Tom', 'Michael', 'Peter']
+    const insertItems = []
 
-    ids.forEach(async (id) => {
-      const insertDataParams = { TableName : tableName, Item: { Id: id} };
-      await documentClient.put(insertDataParams).promise()
+    ids.forEach((id) => {
+      const item = { PutRequest: { Item: { Id: id} } };
+     insertItems.push(item);
     });
+
+    console.log(tableName)
+
+    // tableName constant not resolving?
+    const insertDataParams = { RequestItems: { "MockTable" : insertItems }};
+    await documentClient.batchWrite(insertDataParams).promise()
 
     // ACT - run DynamoScan method
     const result = await dynamoScan(documentClient, dynamoScanRequest) //already returns a promise
-    console.log(result)
 
     // ASSERT - verify DynamoScan has returned correct data - expect statements
     expect(result.length).toBe(3);
-    expect(result).toEqual([{ Id: 'Tom' }, { Id: 'Michael' }, { Id: 'Peter' }])
+    expect(result).toEqual([{ Id: 'Michael' }, { Id: 'Peter' }, { Id: 'Tom' }]) //results returned alphabetically
 
   });
 
