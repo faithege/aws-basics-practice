@@ -49,7 +49,27 @@ describe('testing dynamoScan', () => {
 
   });
 
-  
+  test('dynamoScan recurses correctly and returns all data, ', async () => {
+    // Note that the tests above use minimal data, and are only testing the base scanning function of DynamoScan
+    // To test the recursion we need to either  inset more data or reduce the scan Limit so that the dynamo response is paginated and recursion triggered
+
+    // ARRANGE - insert data
+    const ids = ['Tom', 'Michael', 'Peter']
+
+    ids.forEach(async (id) => {
+      const insertDataParams = { TableName : tableName, Item: { Id: id} };
+      await documentClient.put(insertDataParams).promise()
+    });
+
+    // ACT - run DynamoScan method
+    const result = await dynamoScan(documentClient, dynamoScanRequest) //already returns a promise
+    console.log(result)
+
+    // ASSERT - verify DynamoScan has returned correct data - expect statements
+    expect(result.length).toBe(3);
+    expect(result).toEqual([{ Id: 'Tom' }, { Id: 'Michael' }, { Id: 'Peter' }])
+
+  });
 
 
 async function createTestTable(dynamoDbClient,tableName) {
