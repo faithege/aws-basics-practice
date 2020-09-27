@@ -1,5 +1,5 @@
-const { dynamoScan } = require("./handlers");
-const AWS = require("aws-sdk") // in package.json
+import {dynamoScan} from "./handlers" // const { dynamoScan } = require("./handlers");
+import AWS from 'aws-sdk' // in package.json //const AWS = require("aws-sdk") 
 
 describe('example test', () => {
   test('adds 1 + 2 to equal 3', () => {
