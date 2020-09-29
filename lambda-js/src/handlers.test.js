@@ -49,6 +49,37 @@ describe('testing dynamoScan', () => {
 
   });
 
+  test('dynamoScan recurses correctly and returns all data, ', async () => {
+    // Note that the tests above use minimal data, and are only testing the base scanning function of DynamoScan
+    // To test the recursion we need to either  inset more data or reduce the scan Limit so that the dynamo response is paginated and recursion triggered
+
+    // ARRANGE - insert data
+    const ids = ['Tom', 'Michael', 'Peter']
+
+    // ids.forEach((id) => {
+    //   const item = { PutRequest: { Item: { Id: id} } };
+    //  insertItems.push(item);
+    // });
+
+    const insertItems = ids.map( id => {
+      //because I'm returning an object - curly brackets need to remain, otherwise one liners don't need {}, nor return statement
+      return { PutRequest: { Item: { Id: id} } };
+    })
+
+
+    // tableName constant not resolving?
+    const insertDataParams = { RequestItems: { [tableName] : insertItems }};
+    await documentClient.batchWrite(insertDataParams).promise()
+
+    // ACT - run DynamoScan method
+    const result = await dynamoScan(documentClient, dynamoScanRequest) //already returns a promise
+
+    // ASSERT - verify DynamoScan has returned correct data - expect statements
+    expect(result.length).toBe(3);
+    expect(result).toEqual([{ Id: 'Michael' }, { Id: 'Peter' }, { Id: 'Tom' }]) //results returned alphabetically
+
+  });
+
 });
 
 describe('testing handleGetRequest', () => {
@@ -65,7 +96,7 @@ describe('testing handleGetRequest', () => {
   
   afterEach(async () => {
     await dynamoDbClient.deleteTable({TableName : tableName}).promise()
-  });
+  })
 
   test('handleGetRequest returns a 200 response on success', async () => {
     
