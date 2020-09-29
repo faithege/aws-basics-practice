@@ -3,3 +3,4 @@ output
 working/
 node_modules/
 lambda-js/lib/
+coverage/
