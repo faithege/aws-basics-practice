@@ -79,12 +79,25 @@ describe('testing handleGetRequest', () => {
   });
 
   test('handleGetRequest returns a rejected promise on failure', async () => {
+
+    //ARRANGE
+    const mockDocumentClient = {
+      scan: () => {
+        return {
+          promise: jest.fn().mockRejectedValue('error')}
+      }
+    };
+
     
-    // ACT 
-    const result = await handleGetRequest(documentClient, tableName)
+    // ACT - don't await
+    const result = handleGetRequest(mockDocumentClient, tableName)
  
     // ASSERT 
     expect(result).rejects.toBe('error');
+
+    //alternative with await - pass it a function, execution deferred until inside expect (if not it's run immediately)
+    // we can't use awaits and expect to throw
+    // expect( async () => { await handleGetRequest(mockDocumentClient, tableName)}).toThrow('error')
 
   });
 
