@@ -55,17 +55,20 @@ describe('testing dynamoScan', () => {
 
     // ARRANGE - insert data
     const ids = ['Tom', 'Michael', 'Peter']
-    const insertItems = []
 
-    ids.forEach((id) => {
-      const item = { PutRequest: { Item: { Id: id} } };
-     insertItems.push(item);
-    });
+    // ids.forEach((id) => {
+    //   const item = { PutRequest: { Item: { Id: id} } };
+    //  insertItems.push(item);
+    // });
 
-    console.log(tableName)
+    const insertItems = ids.map( id => {
+      //because I'm returning an object - curly brackets need to remain, otherwise one liners don't need {}, nor return statement
+      return { PutRequest: { Item: { Id: id} } };
+    })
+
 
     // tableName constant not resolving?
-    const insertDataParams = { RequestItems: { "MockTable" : insertItems }};
+    const insertDataParams = { RequestItems: { [tableName] : insertItems }};
     await documentClient.batchWrite(insertDataParams).promise()
 
     // ACT - run DynamoScan method
