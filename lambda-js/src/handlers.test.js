@@ -1,4 +1,4 @@
-import { dynamoScan, handleGetRequest } from "./handlers" // const { dynamoScan } = require("./handlers");
+import { dynamoScan, handleGetRequest, handlePostRequest } from "./handlers" // const { dynamoScan } = require("./handlers");
 import AWS from 'aws-sdk' // in package.json //const AWS = require("aws-sdk") 
 
 describe('example test', () => {
@@ -67,7 +67,7 @@ describe('testing dynamoScan', () => {
     })
 
 
-    // tableName constant not resolving?
+    // tableName constant alone does not resolve on LHS, interpreted as string - therefore  use []
     const insertDataParams = { RequestItems: { [tableName] : insertItems }};
     await documentClient.batchWrite(insertDataParams).promise()
 
@@ -87,7 +87,6 @@ describe('testing handleGetRequest', () => {
   const dynamoDbClient = new AWS.DynamoDB({'region': 'eu-west-1', 'endpoint': 'http://localhost:4566' }) // region needs to match what's in docker compose
   const documentClient = new AWS.DynamoDB.DocumentClient({'service': dynamoDbClient}) //sits on top od DDB client
   const tableName = "MockTable"
-  const dynamoScanRequest = { TableName: tableName, Limit: 2}
 
   beforeEach(async () => {
     await createTestTable(dynamoDbClient,tableName)
@@ -120,7 +119,7 @@ describe('testing handleGetRequest', () => {
     };
 
     
-    // ACT - don't await
+    // ACT - don't await, as it won't catch an exception
     const result = handleGetRequest(mockDocumentClient, tableName)
  
     // ASSERT 
@@ -129,6 +128,82 @@ describe('testing handleGetRequest', () => {
     //alternative with await - pass it a function, execution deferred until inside expect (if not it's run immediately)
     // we can't use awaits and expect to throw
     // expect( async () => { await handleGetRequest(mockDocumentClient, tableName)}).toThrow('error')
+
+  });
+
+});
+
+describe('testing handleGetRequest', () => {
+  // Applies only to tests in this describe block
+  const dynamoDbClient = new AWS.DynamoDB({'region': 'eu-west-1', 'endpoint': 'http://localhost:4566' }) // region needs to match what's in docker compose
+  const documentClient = new AWS.DynamoDB.DocumentClient({'service': dynamoDbClient}) //sits on top od DDB client
+  const tableName = "MockTable"
+  const testPostBody = {
+    id: "Test"
+  }
+  const testEvent = { 
+      httpMethod: "POST",
+      body: JSON.stringify(testPostBody)
+  }
+
+  beforeEach(async () => {
+    await createTestTable(dynamoDbClient,tableName)
+    // remember to use await needed so we don't continue through the code before table has finished being made
+  });
+  
+  afterEach(async () => {
+    await dynamoDbClient.deleteTable({TableName : tableName}).promise()
+  })
+
+
+  test('handlePostRequest returns a rejected promise on failure', async () => {
+
+    //ARRANGE
+    const mockDocumentClient = {
+      update: () => {
+        return {
+          promise: jest.fn().mockRejectedValue('error')}
+      }
+    };
+
+    // ACT
+    const result = handlePostRequest(mockDocumentClient, tableName, testEvent)
+ 
+    // ASSERT 
+    expect(result).rejects.toBe('error');
+
+  });
+
+  // unit test for handle post - test that if fails returns a rejected promise? successful 201 with and without step on correct key - bit more logic
+
+  test('handlePostRequest returns a 201 response on success and that a default step of 1 is used for the specified ID', async () => {
+    
+    // ACT 
+    const result = await handlePostRequest(documentClient, tableName, testEvent);
+
+    // ASSERT 
+    const expectedBody = { Attributes: { SeenCount: 1} }
+    expect(result.statusCode).toBe(201); 
+    expect(result.body).toEqual(JSON.stringify(expectedBody)) 
+
+  });
+
+  test('handlePostRequest returns a 201 response on success and that the specified step is used for the specified ID', async () => {
+    
+    // ARRANGE
+    testPostBody.step = 5;
+    const testEvent2 = { 
+      httpMethod: "POST",
+      body: JSON.stringify(testPostBody)
+  }
+
+    // ACT 
+    const result = await handlePostRequest(documentClient, tableName, testEvent2);
+
+    // ASSERT 
+    const expectedBody = { Attributes: { SeenCount: 2} }
+    expect(result.statusCode).toBe(201); 
+    expect(result.body).toEqual(JSON.stringify(expectedBody)) 
 
   });
 
@@ -159,4 +234,3 @@ async function createTestTable(dynamoDbClient,tableName) {
   await dynamoDbClient.createTable(createTableParams).promise()
 }
 
-// unit test for handle post - test that if fails returns a rejected promise? successful 201 with and without step

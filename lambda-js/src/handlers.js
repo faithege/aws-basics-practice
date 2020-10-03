@@ -31,7 +31,6 @@ export async function handleGetRequest(documentClient, tablename) {
     TableName: tablename,
     Limit: 5
   }
-  console.log("Scanning DDB", JSON.stringify(request))
 
   const data = await dynamoScan(documentClient, request)
   // Code below will execute if promise resolves successfully, if want to respond to errors use try catch

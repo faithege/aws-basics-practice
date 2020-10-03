@@ -5,6 +5,7 @@
   "main": "step-lambda.js",
   "scripts": {
     "test": "jest --coverage",
+    "test:watch": "jest --watch",
     "transpile": "babel src --out-dir lib",
     "invokeGet": "npm run transpile && node ./lib/run-local.js GET",
     "invokePost": "npm run transpile && node ./lib/run-local.js POST"
