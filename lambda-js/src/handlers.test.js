@@ -1,29 +1,23 @@
 import { dynamoScan, handleGetRequest, handlePostRequest } from "./handlers" // const { dynamoScan } = require("./handlers");
 import AWS from 'aws-sdk' // in package.json //const AWS = require("aws-sdk") 
 
-describe('example test', () => {
-  test('adds 1 + 2 to equal 3', () => {
-    expect(1+2).toBe(3);
-  });
+const dynamoDbClient = new AWS.DynamoDB({'region': 'eu-west-1', 'endpoint': 'http://localhost:4566' }) // region needs to match what's in docker compose
+const documentClient = new AWS.DynamoDB.DocumentClient({'service': dynamoDbClient}) //sits on top od DDB client
+const tableName = "MockTable"
+const dynamoScanRequest = { TableName: tableName, Limit: 2}
+
+beforeEach(async () => {
+  await createTestTable(dynamoDbClient,tableName)
+  // remember to use await needed so we don't continue through the code before table has finished being made
+});
+
+afterEach(async () => {
+  await dynamoDbClient.deleteTable({TableName : tableName}).promise()
 });
 
 describe('testing dynamoScan', () => {
   // Applies only to tests in this describe block
-  const dynamoDbClient = new AWS.DynamoDB({'region': 'eu-west-1', 'endpoint': 'http://localhost:4566' }) // region needs to match what's in docker compose
-  const documentClient = new AWS.DynamoDB.DocumentClient({'service': dynamoDbClient}) //sits on top od DDB client
-  const tableName = "MockTable"
-  const dynamoScanRequest = { TableName: tableName, Limit: 2}
-
-  beforeEach(async () => {
-    await createTestTable(dynamoDbClient,tableName)
-    // remember to use await needed so we don't continue through the code before table has finished being made
-  });
   
-  afterEach(async () => {
-    await dynamoDbClient.deleteTable({TableName : tableName}).promise()
-  });
-
-
   test('dynamoScan returns all data in a table', async () => {
     
     // ARRANGE - insert data
@@ -83,21 +77,8 @@ describe('testing dynamoScan', () => {
 });
 
 describe('testing handleGetRequest', () => {
-  // Applies only to tests in this describe block
-  const dynamoDbClient = new AWS.DynamoDB({'region': 'eu-west-1', 'endpoint': 'http://localhost:4566' }) // region needs to match what's in docker compose
-  const documentClient = new AWS.DynamoDB.DocumentClient({'service': dynamoDbClient}) //sits on top od DDB client
-  const tableName = "MockTable"
 
-  beforeEach(async () => {
-    await createTestTable(dynamoDbClient,tableName)
-    // remember to use await needed so we don't continue through the code before table has finished being made
-  });
-  
-  afterEach(async () => {
-    await dynamoDbClient.deleteTable({TableName : tableName}).promise()
-  })
-
-  test('handleGetRequest returns a 200 response on success', async () => {
+  test('returns a 200 response on success', async () => {
     
     // ACT 
     const result = await handleGetRequest(documentClient, tableName);
@@ -108,7 +89,7 @@ describe('testing handleGetRequest', () => {
 
   });
 
-  test('handleGetRequest returns a rejected promise on failure', async () => {
+  test('returns a rejected promise on failure', async () => {
 
     //ARRANGE
     const mockDocumentClient = {
@@ -134,10 +115,6 @@ describe('testing handleGetRequest', () => {
 });
 
 describe('testing handleGetRequest', () => {
-  // Applies only to tests in this describe block
-  const dynamoDbClient = new AWS.DynamoDB({'region': 'eu-west-1', 'endpoint': 'http://localhost:4566' }) // region needs to match what's in docker compose
-  const documentClient = new AWS.DynamoDB.DocumentClient({'service': dynamoDbClient}) //sits on top od DDB client
-  const tableName = "MockTable"
   const testPostBody = {
     id: "Test"
   }
@@ -146,17 +123,7 @@ describe('testing handleGetRequest', () => {
       body: JSON.stringify(testPostBody)
   }
 
-  beforeEach(async () => {
-    await createTestTable(dynamoDbClient,tableName)
-    // remember to use await needed so we don't continue through the code before table has finished being made
-  });
-  
-  afterEach(async () => {
-    await dynamoDbClient.deleteTable({TableName : tableName}).promise()
-  })
-
-
-  test('handlePostRequest returns a rejected promise on failure', async () => {
+  test('returns a rejected promise on failure', async () => {
 
     //ARRANGE
     const mockDocumentClient = {
@@ -176,7 +143,7 @@ describe('testing handleGetRequest', () => {
 
   // unit test for handle post - test that if fails returns a rejected promise? successful 201 with and without step on correct key - bit more logic
 
-  test('handlePostRequest returns a 201 response on success and that a default step of 1 is used for the specified ID', async () => {
+  test('returns a 201 response on success and that a default step of 1 is used for the specified ID', async () => {
     
     // ACT 
     const result = await handlePostRequest(documentClient, tableName, testEvent);
@@ -188,7 +155,7 @@ describe('testing handleGetRequest', () => {
 
   });
 
-  test('handlePostRequest returns a 201 response on success and that the specified step is used for the specified ID', async () => {
+  test('returns a 201 response on success and that the specified step is used for the specified ID', async () => {
     
     // ARRANGE
     testPostBody.step = 5;
@@ -201,7 +168,7 @@ describe('testing handleGetRequest', () => {
     const result = await handlePostRequest(documentClient, tableName, testEvent2);
 
     // ASSERT 
-    const expectedBody = { Attributes: { SeenCount: 2} }
+    const expectedBody = { Attributes: { SeenCount: 5} }
     expect(result.statusCode).toBe(201); 
     expect(result.body).toEqual(JSON.stringify(expectedBody)) 
 
