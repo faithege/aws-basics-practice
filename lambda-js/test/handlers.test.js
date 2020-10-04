@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import AWS from 'aws-sdk'; // in package.json //const AWS = require("aws-sdk")
-import { dynamoScan, handleGetRequest, handlePostRequest } from './handlers'; // const { dynamoScan } = require("./handlers");
+import { dynamoScan, handleGetRequest, handlePostRequest } from '../src/handlers'; // const { dynamoScan } = require("./handlers");
 
 const dynamoDbClient = new AWS.DynamoDB({region: 'eu-west-1', endpoint: 'http://localhost:4566' }); // region needs to match what's in docker compose
 const documentClient = new AWS.DynamoDB.DocumentClient({service: dynamoDbClient}); //sits on top od DDB client

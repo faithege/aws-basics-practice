@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "eslint",
     "test": "../scripts/check-local-stack-running.sh && jest --coverage",
-    "test:watch": "jest --watch",
+    "test:watch": "../scripts/check-local-stack-running.sh && jest --watch",
     "transpile": "babel src --out-dir lib",
     "invokeGet": "npm run transpile && node ./lib/run-local.js GET",
     "invokePost": "npm run transpile && node ./lib/run-local.js POST"
