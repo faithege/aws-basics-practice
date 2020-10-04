@@ -5,8 +5,7 @@
   "main": "step-lambda.js",
   "scripts": {
     "lint": "eslint",
-    "test": "jest --coverage",
-    "test:check": "../scripts/check-local-stack-running.sh && jest --coverage",
+    "test": "../scripts/check-local-stack-running.sh && jest --coverage",
     "test:watch": "jest --watch",
     "transpile": "babel src --out-dir lib",
     "invokeGet": "npm run transpile && node ./lib/run-local.js GET",
