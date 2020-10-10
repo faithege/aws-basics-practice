@@ -1,3 +1,4 @@
+import { APIGatewayProxyEvent, APIGatewayProxyResultV2 } from 'aws-lambda';
 /* eslint-disable max-len */
 import AWS from 'aws-sdk';  // this sdk supports promises
 import { handlePostRequest, handleGetRequest } from './handlers';
@@ -23,12 +24,19 @@ const documentClient = new AWS.DynamoDB.DocumentClient({ region, endpoint });
 // NB 'context' parameter has info in it tthat we could find useful and extract, although in this example we don't need it
 
 // This is an async function
-exports.handler = async function(event, context) {
+exports.handler = async function(event: APIGatewayProxyEvent): Promise<APIGatewayProxyResultV2> {
   // console.log(process.env.AWS_ACCESS_KEY_ID, process.env.AWS_SECRET_ACCESS_KEY, process.env.AWS_SESSION_TOKEN)
   console.log('Received event', JSON.stringify(event));
 
   const method = event.httpMethod;
   console.log('method:', method);
+
+  if (!tablename) {
+    // This is our fault, not the users as we should be defining table name
+    // Bad practice to leak to a user what has happened internally - keep it vague for user, logging for us
+    console.error('ENV VAR TABLE_NAME has not been defined')
+    return { statusCode: 500, body: 'There\'s an internal configuration error' };
+  }
 
   try {
     switch (method) {
