@@ -59,3 +59,38 @@ function sumOfDigits(number){
 console.log(sumOfDigits(234))
 console.log(sumOfDigits(17))
 console.log(sumOfDigits(21211))
+
+function reverseString(string){
+
+    lastChar = string.slice(-1)
+
+    if (string.length === 0){
+        return ''
+    } else {
+        return lastChar + reverseString(string.substring(0, string.length - 1)) //my attempt - works!!
+        
+    }
+}
+
+//alternative
+function revStr(str){
+    if (str === '') return '';
+    return revStr(str.substr(1)) + str[0];
+  }
+  revStr('cat');
+  // tac
+
+console.log(reverseString('hello'))
+
+//example i thought of myself
+function powerOf(x,y){
+    if (y===0){
+        return 1
+    } else {
+        return x * powerOf(x,y-1)
+    }
+}
+
+console.log(powerOf(9,2)) //81
+console.log(powerOf(2,5)) //32
+console.log(powerOf(3,6)) //729
