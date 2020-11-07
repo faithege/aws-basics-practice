@@ -1,14 +1,14 @@
-import { APIGatewayProxyEvent, APIGatewayProxyResultV2 } from "aws-lambda";
+import { APIGatewayProxyEvent, APIGatewayProxyResultV2, APIGatewayProxyStructuredResultV2 } from "aws-lambda";
 // const handlePostRequest = async function(event) { << example of Functional Programming
 import { DocumentClient, ItemList, Key, ScanInput } from "aws-sdk/clients/dynamodb";
 
-interface SeenEvent {
+export interface SeenEvent {
   id: string
   step?: number 
 }
 
 //in newer JS can export functions/constants in the same file separately - we are able tto do this as we then transpile
-export async function handlePostRequest(documentClient: DocumentClient, tablename: string, event: APIGatewayProxyEvent) : Promise<APIGatewayProxyResultV2> {
+export async function handlePostRequest(documentClient: DocumentClient, tablename: string, event: APIGatewayProxyEvent | any) : Promise<APIGatewayProxyStructuredResultV2> {
   if (!event.body) {
     console.log("Event body is undefined");
     return { statusCode: 400, body: `HTTP Body is missing, please add one for a POST request` }
@@ -56,7 +56,7 @@ export async function dynamoScan(documentClient: DocumentClient, req: ScanInput,
   return dynamoScan(documentClient, req,data.LastEvaluatedKey, newAccumulator);
 }
 
-export async function handleGetRequest(documentClient: DocumentClient, tablename: string): Promise<APIGatewayProxyResultV2> {
+export async function handleGetRequest(documentClient: DocumentClient, tablename: string): Promise<APIGatewayProxyStructuredResultV2> {
   // nesting functions ok for recursive functions - moved out for testing purposes
 
   const request = {

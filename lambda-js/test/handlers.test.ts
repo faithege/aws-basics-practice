@@ -1,6 +1,7 @@
 /* eslint-disable max-len */
 import AWS from 'aws-sdk'; // in package.json //const AWS = require("aws-sdk")
-import { dynamoScan, handleGetRequest, handlePostRequest } from '../src/handlers'; // const { dynamoScan } = require("./handlers");
+import DynamoDB, { DocumentClient } from 'aws-sdk/clients/dynamodb';
+import { dynamoScan, handleGetRequest, handlePostRequest, SeenEvent } from '../src/handlers'; // const { dynamoScan } = require("./handlers");
 
 const dynamoDbClient = new AWS.DynamoDB({region: 'eu-west-1', endpoint: 'http://localhost:4566' }); // region needs to match what's in docker compose
 const documentClient = new AWS.DynamoDB.DocumentClient({service: dynamoDbClient}); //sits on top od DDB client
@@ -82,13 +83,15 @@ describe('testing handleGetRequest', () => {
   });
 
   test('returns a rejected promise on failure', async () => {
+    
+    
     //ARRANGE
-    const mockDocumentClient = {
+    const mockDocumentClient: DocumentClient = {
       scan: () => {
         return {
-          promise: jest.fn().mockRejectedValue('error')};
-      },
-    };
+          promise: jest.fn().mockRejectedValue('error')} as any;
+      } ,
+    } as any; //returning as any so TS passed
 
 
     // ACT - don't await, as it won't catch an exception
@@ -103,13 +106,14 @@ describe('testing handleGetRequest', () => {
   });
 });
 
-describe('testing handleGetRequest', () => {
-  const testPostBody = {
+describe('testing handlePostRequest', () => {
+  const testPostBody: SeenEvent = {
     id: 'Test',
   };
   const testEvent = {
     httpMethod: 'POST',
     body: JSON.stringify(testPostBody),
+    // add in missing attributes or change to any
   };
 
   test('returns a rejected promise on failure', async () => {
@@ -118,8 +122,8 @@ describe('testing handleGetRequest', () => {
       update: () => {
         return {
           promise: jest.fn().mockRejectedValue('error')};
-      },
-    };
+      } ,
+    } as any;
 
     // ACT
     const result = handlePostRequest(mockDocumentClient, tableName, testEvent);
@@ -158,7 +162,7 @@ describe('testing handleGetRequest', () => {
   });
 });
 
-async function createTestTable(dynamoDbClient,tableName) {
+async function createTestTable(dynamoDbClient: DynamoDB,tableName: string) {
   const createTableParams = {
     AttributeDefinitions: [
       {
